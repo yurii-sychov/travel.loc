@@ -2,6 +2,8 @@ import Navbar from './components/Navbar';
 // import Carousel from './components/Carousel';
 import Footer from './components/Footer';
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 const App = () => {
 	return (
 		<>
@@ -11,33 +13,9 @@ const App = () => {
 				<div className='container-fluid'>
 					<div className='row'>
 						<div className='col'>
-							{/* Button trigger modal */}
-							<button type='button' className='btn btn-primary' data-bs-toggle='modal' data-bs-target='#exampleModal'>
-								Launch demo modal
-							</button>
-
-							{/* Modal */}
-							<div className='modal fade' id='exampleModal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
-								<div className='modal-dialog modal-lg'>
-									<div className='modal-content'>
-										<div className='modal-header'>
-											<h5 className='modal-title' id='exampleModalLabel'>
-												Modal title
-											</h5>
-											<button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-										</div>
-										<div className='modal-body'>...</div>
-										<div className='modal-footer'>
-											<button type='button' className='btn btn-secondary' data-bs-dismiss='modal'>
-												Close
-											</button>
-											<button type='button' className='btn btn-primary'>
-												Save changes
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>
+							<LoginButton />
+							<LogoutButton />
+							<Profile />
 						</div>
 					</div>
 				</div>
@@ -46,5 +24,39 @@ const App = () => {
 		</>
 	);
 }
+
+const LoginButton = () => {
+	const { loginWithRedirect } = useAuth0();
+
+	return <button onClick={() => loginWithRedirect()}>Log In</button>;
+};
+
+const LogoutButton = () => {
+	const { logout } = useAuth0();
+
+	return (
+		<button onClick={() => logout({ returnTo: window.location.origin })}>
+			Log Out
+		</button>
+	);
+};
+
+const Profile = () => {
+	const { user, isAuthenticated, isLoading } = useAuth0();
+	console.log(user, isAuthenticated, isLoading)
+	if (isLoading) {
+		return <div>Loading ...</div>;
+	}
+
+	return (
+		isAuthenticated && (
+			<div>
+				<img src={user.picture} alt={user.name} />
+				<h2>{user.name}</h2>
+				<p>{user.email}</p>
+			</div>
+		)
+	);
+};
 
 export default App;
